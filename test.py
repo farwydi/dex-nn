@@ -77,6 +77,14 @@ class TestNeuralNetwork(unittest.TestCase):
         self.assertEqual(round(op.power, 2), 0.33)
 
         __nn.learning([1])
+        __nn.result()
+
+        self.assertEqual(round(w1.weight, 1), 0.5)
+        self.assertEqual(round(w2.weight, 2), 0.73)
+        self.assertEqual(round(w3.weight, 2), -0,12)
+        self.assertEqual(round(w4.weight, 2), 0.13)
+        self.assertEqual(round(w5.weight, 3), 1.563)
+        self.assertEqual(round(w6.weight, 2), -2.2)
         self.assertEqual(round(op.power, 2), 0.37)
 
 unittest.main()
