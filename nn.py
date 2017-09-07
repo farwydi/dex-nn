@@ -37,6 +37,7 @@ class Neuron:
         self.delta = .0
         self.backs = []
         self.type = type
+        self.name = ''
 
     def addConnect(self, to):
         self.connects.append(to)

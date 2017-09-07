@@ -8,18 +8,23 @@ class TestNeuralNetwork(unittest.TestCase):
     #     __nn.set([0, 1])
     #     __nn.result()
 
-    #     self.assertEqual(op.power, 0.33)
+    #     self.assertEqual(round(__nn.output.layout.neurons[0].power, 2), 0.33)
 
     def test_force(self):
         i1 = nn.Neuron(nn.NeuronType.INPUT)
         i1.power = 1
+        i1.name = 'INPUT 1'
         i2 = nn.Neuron(nn.NeuronType.INPUT)
         i2.power = 0
+        i2.name = 'INPUT 2'
 
         h1 = nn.Neuron(nn.NeuronType.HIDDEN)
+        h1.name = 'HIDDEN 1'
         h2 = nn.Neuron(nn.NeuronType.HIDDEN)
+        h2.name = 'HIDDEN 2'
 
         op = nn.Neuron(nn.NeuronType.OUTPUT)
+        op.name = 'OUTPUT'
 
         h1.addBack(op)
         h2.addBack(op)
@@ -32,10 +37,10 @@ class TestNeuralNetwork(unittest.TestCase):
 
         w1 = nn.Connect(h1, i1)
         w1.weight = .45
-        w2 = nn.Connect(h1, i2)
+        w2 = nn.Connect(h2, i1)
         w2.weight = .78
 
-        w3 = nn.Connect(h2, i1)
+        w3 = nn.Connect(h1, i1)
         w3.weight = -0.12
         w4 = nn.Connect(h2, i2)
         w4.weight = .13
@@ -69,7 +74,9 @@ class TestNeuralNetwork(unittest.TestCase):
         __nn.hidden.layouts.append(hl_l1)
 
         __nn.result()
+        self.assertEqual(round(op.power, 2), 0.33)
 
-        self.assertEqual(op.power, 0.33)
+        __nn.learning([1])
+        self.assertEqual(round(op.power, 2), 0.37)
 
 unittest.main()
