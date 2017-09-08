@@ -256,7 +256,7 @@ class NeuralNetwork:
                 if strSize > 0:
                     name = f.read(strSize)
                     name = name.decode('utf-8')
-                    
+
                     self.hidden.layouts[l].neurons[n].name = name
 
         size = unpack('I', f.read(4))[0]
@@ -267,7 +267,7 @@ class NeuralNetwork:
             if strSize > 0:
                 name = f.read(strSize)
                 name = name.decode('utf-8')
-                    
+
                 self.input.layout.neurons[n].name = name
 
         size = unpack('I', f.read(4))[0]
@@ -278,7 +278,7 @@ class NeuralNetwork:
             if strSize > 0:
                 name = f.read(strSize)
                 name = name.decode('utf-8')
-                    
+
                 self.output.layout.neurons[n].name = name
 
         for n in range(self.output.size):
@@ -289,7 +289,7 @@ class NeuralNetwork:
                 strSize = unpack('I', f.read(4))[0]
                 if strSize > 0:
                     name = f.read(strSize)
-                    name = name.decode('utf-8')            
+                    name = name.decode('utf-8')
                     self.output.layout.neurons[n].connects[x].name = name
 
         for n in range(self.hidden.depth):
@@ -301,12 +301,13 @@ class NeuralNetwork:
             for x in range(self.hidden.size):
                 for y in range(size):
                     weight = unpack('f', f.read(4))[0]
-                    self.hidden.layouts[n].neurons[x].connects[y].weight = weight
+                    self.hidden.layouts[n].neurons[
+                        x].connects[y].weight = weight
 
                     strSize = unpack('I', f.read(4))[0]
                     if strSize > 0:
                         name = f.read(strSize)
-                        name = name.decode('utf-8')            
+                        name = name.decode('utf-8')
                         self.output.layout.neurons[n].connects[x].name = name
 
         f.close()

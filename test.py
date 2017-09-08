@@ -7,15 +7,7 @@ class TestNeuralNetwork(unittest.TestCase):
         __nn = nn.NeuralNetwork(2, 1, 5, 1)
         __nn.load('xor.nn')
 
-        # __nn.setEA(.15, .3)
-
         _test = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]]
-
-        # # leaning
-        # for epoch in range(15000):
-        #     for params in _test:
-        #         __nn.set([params[0], params[1]])
-        #         __nn.learning([params[2]])
 
         for iteration in range(50000):
             for params in _test:
