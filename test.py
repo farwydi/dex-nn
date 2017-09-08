@@ -3,12 +3,78 @@ import nn
 
 class TestNeuralNetwork(unittest.TestCase):
 
-    # def test_soft(self):
-    #     __nn = nn.NeuralNetwork(2, 1, 2, 1)
-    #     __nn.set([0, 1])
-    #     __nn.result()
+    def test_learning(self):
+        __nn = nn.NeuralNetwork(2, 1, 2, 1)
+        __nn.set([1, 0])
 
-    #     self.assertEqual(round(__nn.output.layout.neurons[0].power, 2), 0.33)
+        __nn.result()
+
+        self.assertEqual(round(__nn.output.layout.neurons[0].power), 1)
+
+    def test_soft_learning(self):
+        __nn = nn.NeuralNetwork(2, 1, 2, 1)
+        __nn.set([1, 0])
+
+        __nn.input.layout.neurons[0].name = 'I1'
+        __nn.input.layout.neurons[1].name = 'I2'
+
+        # h1 w1
+        __nn.hidden.layouts[0].neurons[0].name = 'H1'
+        __nn.hidden.layouts[0].neurons[0].connects[0].weight = 0.45
+        __nn.hidden.layouts[0].neurons[0].connects[0].name = 'w1'
+        # h1 w3
+        __nn.hidden.layouts[0].neurons[0].connects[1].weight = -0.12
+        __nn.hidden.layouts[0].neurons[0].connects[1].name = 'w3'
+        # h2 w2
+        __nn.hidden.layouts[0].neurons[1].name = 'H2'
+        __nn.hidden.layouts[0].neurons[1].connects[0].weight = 0.78
+        __nn.hidden.layouts[0].neurons[1].connects[0].name = 'w2'
+        # h2 w4
+        __nn.hidden.layouts[0].neurons[1].connects[1].weight = 0.13
+        __nn.hidden.layouts[0].neurons[1].connects[1].name = 'w4'
+
+        __nn.output.layout.neurons[0].name = 'O1'
+        __nn.output.layout.neurons[0].connects[0].weight = 1.5
+        __nn.output.layout.neurons[0].connects[0].name = 'w5'
+        __nn.output.layout.neurons[0].connects[1].weight = -2.3
+        __nn.output.layout.neurons[0].connects[1].name = 'w6'
+
+        __nn.learning([1])
+        __nn.result()
+
+        self.assertEqual(round(__nn.output.layout.neurons[0].power, 2), 0.37)
+
+    def test_soft(self):
+        __nn = nn.NeuralNetwork(2, 1, 2, 1)
+        __nn.set([1, 0])
+
+        __nn.input.layout.neurons[0].name = 'I1'
+        __nn.input.layout.neurons[1].name = 'I2'
+
+        # h1 w1
+        __nn.hidden.layouts[0].neurons[0].name = 'H1'
+        __nn.hidden.layouts[0].neurons[0].connects[0].weight = 0.45
+        __nn.hidden.layouts[0].neurons[0].connects[0].name = 'w1'
+        # h1 w3
+        __nn.hidden.layouts[0].neurons[0].connects[1].weight = -0.12
+        __nn.hidden.layouts[0].neurons[0].connects[1].name = 'w3'
+        # h2 w2
+        __nn.hidden.layouts[0].neurons[1].name = 'H2'
+        __nn.hidden.layouts[0].neurons[1].connects[0].weight = 0.78
+        __nn.hidden.layouts[0].neurons[1].connects[0].name = 'w2'
+        # h2 w4
+        __nn.hidden.layouts[0].neurons[1].connects[1].weight = 0.13
+        __nn.hidden.layouts[0].neurons[1].connects[1].name = 'w4'
+
+        __nn.output.layout.neurons[0].name = 'O1'
+        __nn.output.layout.neurons[0].connects[0].weight = 1.5
+        __nn.output.layout.neurons[0].connects[0].name = 'w5'
+        __nn.output.layout.neurons[0].connects[1].weight = -2.3
+        __nn.output.layout.neurons[0].connects[1].name = 'w6'
+
+        __nn.result()
+
+        self.assertEqual(round(__nn.output.layout.neurons[0].power, 2), 0.34)
 
     def test_force(self):
         i1 = nn.Neuron(nn.NeuronType.INPUT)
@@ -40,7 +106,7 @@ class TestNeuralNetwork(unittest.TestCase):
         w2 = nn.Connect(h2, i1)
         w2.weight = .78
 
-        w3 = nn.Connect(h1, i1)
+        w3 = nn.Connect(h1, i2)
         w3.weight = -0.12
         w4 = nn.Connect(h2, i2)
         w4.weight = .13
@@ -74,17 +140,17 @@ class TestNeuralNetwork(unittest.TestCase):
         __nn.hidden.layouts.append(hl_l1)
 
         __nn.result()
-        self.assertEqual(round(op.power, 2), 0.33)
+        self.assertEqual(round(op.power, 2), 0.34)
 
-        __nn.learning([1])
-        __nn.result()
+        # __nn.learning([1])
+        # __nn.result()
 
-        self.assertEqual(round(w1.weight, 1), 0.5)
-        self.assertEqual(round(w2.weight, 2), 0.73)
-        self.assertEqual(round(w3.weight, 2), -0,12)
-        self.assertEqual(round(w4.weight, 2), 0.13)
-        self.assertEqual(round(w5.weight, 3), 1.563)
-        self.assertEqual(round(w6.weight, 2), -2.2)
-        self.assertEqual(round(op.power, 2), 0.37)
+        # self.assertEqual(round(w1.weight, 1), 0.5)
+        # self.assertEqual(round(w2.weight, 2), 0.73)
+        # self.assertEqual(round(w3.weight, 2), -0,12)
+        # self.assertEqual(round(w4.weight, 2), 0.13)
+        # self.assertEqual(round(w5.weight, 3), 1.563)
+        # self.assertEqual(round(w6.weight, 2), -2.2)
+        # self.assertEqual(round(op.power, 2), 0.37)
 
 unittest.main()

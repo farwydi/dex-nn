@@ -2,7 +2,6 @@ import math
 import random
 from enum import Enum
 
-
 class Connect:
 
     def __init__(self, base, way):
@@ -10,17 +9,16 @@ class Connect:
         self.weight = random.random()
         self.base = base
         self.way = way
-        self.deltaW_i = 0
-        self.E = 0.7
-        self.Α = 0.3
+        self.name = ''
+        self.deltaWeight = 0
 
     def echo(self):
         return self.way.power * self.weight
 
-    def learning(self):
-        gradWeight = self.base.delta * self.base.power
-        self.deltaW_i = (self.E * gradWeight) + (self.Α * self.deltaW_i)
-        self.weight = self.weight + self.deltaW_i
+    def learning(self, E, A):
+        gradWeight = self.base.delta * self.way.power
+        self.deltaWeight = (E * gradWeight) + (A * self.deltaWeight)
+        self.weight = self.weight + self.deltaWeight
 
 
 class NeuronType(Enum):
@@ -48,9 +46,9 @@ class Neuron:
     def setInput(self, value):
         self.input = value
 
-    def learning(self):
+    def learning(self, E, A):
         for connect in self.connects:
-            connect.learning()
+            connect.learning(E, A)
 
     def sum(self):
         r = .0
@@ -85,20 +83,9 @@ class Layout:
             s = neuron.sum()
             neuron.power = self.f(s)
 
-    def learning(self):
+    def learning(self, E, A):
         for neuron in self.neurons:
-            delta = .0
-            for neuronBack in neuron.backs:
-                weight = .0
-                for connect in neuronBack.connects:
-                    if connect.way == neuron:
-                        weight = connect.weight
-                        break
-
-                delta += neuronBack.delta * weight
-            neuron.delta = ((1 - neuron.power) * neuron.power) * delta
-            neuron.learning()
-
+            neuron.learning(E, A)
 
 class HiddenLayout:
 
@@ -114,10 +101,26 @@ class HiddenLayout:
             if nDepth > 0:
                 self.layouts[nDepth - 1].bind(self.layouts[nDepth])
 
-    def learning(self):
+    def learning(self, E, A):
         self.calc()
         for layout in self.layouts:
-            layout.learning()
+            layout.learning(E, A)
+
+    def calcDelta(self):
+        self.calc()
+        for layout in self.layouts:
+            for neuron in layout.neurons:
+                delta = .0
+                for neuronBack in neuron.backs:
+                    weight = .0
+                    for connect in neuronBack.connects:
+                        if connect.way == neuron:
+                            weight = connect.weight
+                            break
+
+                    delta += neuronBack.delta * weight
+                neuron.delta = ((1 - neuron.power) * neuron.power) * delta
+                
 
     def calc(self):
         for layout in self.layouts:
@@ -138,8 +141,8 @@ class InputLayout:
 
         self.layout.neurons[number].power = value
 
-    def learning(self):
-        self.layout.learning()
+    def learning(self, E, A):
+        self.layout.learning(E, A)
 
 
 class ResultLayout:
@@ -160,7 +163,7 @@ class ResultLayout:
 
         return r
 
-    def learning(self, correct):
+    def learning(self, correct, E, A):
         if len(correct) > self.size:
             pass  # error
 
@@ -170,7 +173,11 @@ class ResultLayout:
             neuron = self.layout.neurons[x]
             neuron.delta = (correct[x] - neuron.power) * \
                 ((1 - neuron.power) * neuron.power)
-            neuron.learning()
+
+        self.hidden.calcDelta()
+
+        for neuron in self.layout.neurons:
+            neuron.learning(E, A)
 
 
 class NeuralNetwork:
@@ -179,6 +186,9 @@ class NeuralNetwork:
         self.hidden = HiddenLayout(sizeHidden, depthHidden)
         self.input = InputLayout(sizeInput, self.hidden)
         self.output = ResultLayout(sizeOutput, self.hidden)
+
+        self.E = 0.7
+        self.A = 0.3
 
     def set(self, params):
         if len(params) > self.input.size:
@@ -191,18 +201,26 @@ class NeuralNetwork:
         self.hidden.calc()
         return self.output.result()
 
-    def mse(self, result):
+    def mse(self, result, correct):
         mse = []
-        for r in result:
-            mse.append(pow(1 - r, 2) / 1)
+
+        if len(result) != len(correct):
+            return mse # error
+
+        for x in range(len(result)):
+            mse.append(pow(correct[x] - result[x], 2) / 1)
 
         return mse
+    
+    def setEA(self, E, A):
+        self.E = E
+        self.A = A
 
     def learning(self, correct):
         if len(correct) > self.output.size:
             pass  # error
 
         self.hidden.calc()
-        self.output.learning(correct)
-        self.hidden.learning()
-        self.input.learning()
+        self.output.learning(correct, self.E, self.A)
+        self.hidden.learning(self.E, self.A)
+        self.input.learning(self.E, self.A)
