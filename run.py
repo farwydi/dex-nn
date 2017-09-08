@@ -1,7 +1,7 @@
 import nn
 
 # init
-_nn = nn.NeuralNetwork(2, 1, 3, 1)
+_nn = nn.NeuralNetwork(2, 1, 2, 2)
 _test = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]]
 _nn.setEA(.15, .3)
 

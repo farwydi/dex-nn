@@ -11,7 +11,7 @@ class Connect:
         self.weight = random.random()
         self.base = base
         self.way = way
-        self.name = ''
+        self.name = 'CONNECT_' + self.base.name + '_TO_' + self.way.name
         self.deltaWeight = 0
 
     def echo(self):
@@ -30,20 +30,27 @@ class NeuronType(Enum):
 
 
 class Neuron:
-
-    def __init__(self, type):
+    def __init__(self, type, id = 0, levelPrefix = ''):
         self.connects = []
         self.power = .0
         self.delta = .0
         self.backs = []
         self.type = type
-        self.name = ''
+        self.name = str(self.type)[11:] + levelPrefix + '_' + str(id)
+
 
     def addConnect(self, to):
         self.connects.append(to)
 
     def addBack(self, to):
         self.backs.append(to)
+
+    # def getBackDelta(self, to):
+    #     weight = .0
+    #     for back in self.backs:
+    #         if back == to:
+    #             back.,
+                
 
     def setInput(self, value):
         self.input = value
@@ -62,19 +69,21 @@ class Neuron:
 
 class Layout:
 
-    def __init__(self, size, type):
+    def __init__(self, size, type, level = ''):
         self.neurons = []
 
+        idx = 0
         for nSize in range(size):
-            neuron = Neuron(type)
+            neuron = Neuron(type, idx, level)
             self.neurons.append(neuron)
+            idx += 1
 
     def bind(self, layout):
-        for host in self.neurons:
-            for guest in layout.neurons:
-                connect = Connect(host, guest)
-                host.addConnect(connect)
-                guest.addBack(host)
+        for base in self.neurons:
+            for way in layout.neurons:
+                connect = Connect(base, way)
+                base.addConnect(connect)
+                way.addBack(base)
 
     def f(self, x):
         return 1 / (1 + pow(math.e, -1 * x))
@@ -98,7 +107,7 @@ class HiddenLayout:
         self.depth = depth
 
         for nDepth in range(depth):
-            layout = Layout(size, NeuronType.HIDDEN)
+            layout = Layout(size, NeuronType.HIDDEN, '_LEVEL_' + str(nDepth))
             self.layouts.append(layout)
 
             if nDepth > 0:
@@ -111,7 +120,7 @@ class HiddenLayout:
 
     def calcDelta(self):
         self.calc()
-        for layout in self.layouts:
+        for layout in self.layouts[-1:]:
             for neuron in layout.neurons:
                 delta = .0
                 for neuronBack in neuron.backs:
@@ -154,7 +163,7 @@ class ResultLayout:
         self.hidden = hiddenLayout
         if self.size > 0:
             self.layout = Layout(self.size, NeuronType.OUTPUT)
-            self.layout.bind(self.hidden.layouts[self.hidden.depth - 1])
+            self.layout.bind(self.hidden.layouts[-1:][0])
 
     def result(self):
         r = []
