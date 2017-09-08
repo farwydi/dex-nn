@@ -1,6 +1,8 @@
 import math
 import random
 from enum import Enum
+from struct import pack, unpack, calcsize
+
 
 class Connect:
 
@@ -87,6 +89,7 @@ class Layout:
         for neuron in self.neurons:
             neuron.learning(E, A)
 
+
 class HiddenLayout:
 
     def __init__(self, size=10, depth=2):
@@ -120,7 +123,6 @@ class HiddenLayout:
 
                     delta += neuronBack.delta * weight
                 neuron.delta = ((1 - neuron.power) * neuron.power) * delta
-                
 
     def calc(self):
         for layout in self.layouts:
@@ -201,17 +203,125 @@ class NeuralNetwork:
         self.hidden.calc()
         return self.output.result()
 
+    def save(self, filename):
+        f = open(filename, 'wb')
+
+        # hidden
+        f.write(pack('I', self.hidden.depth))
+        f.write(pack('I', self.hidden.size))
+        for layout in self.hidden.layouts:
+            for neuron in layout.neurons:
+                f.write(pack('I', len(neuron.name)))
+                f.write(neuron.name.encode('utf-8'))
+
+        # input
+        f.write(pack('I', self.input.size))
+        for neuron in self.input.layout.neurons:
+            f.write(pack('I', len(neuron.name)))
+            f.write(neuron.name.encode('utf-8'))
+
+        # output
+        f.write(pack('I', self.output.size))
+        for neuron in self.output.layout.neurons:
+            f.write(pack('I', len(neuron.name)))
+            f.write(neuron.name.encode('utf-8'))
+
+        for neuron in self.output.layout.neurons:
+            for connect in neuron.connects:
+                f.write(pack('f', connect.weight))
+
+                f.write(pack('I', len(connect.name)))
+                f.write(connect.name.encode('utf-8'))
+
+        for layout in self.hidden.layouts:
+            for neuron in layout.neurons:
+                for connect in neuron.connects:
+                    f.write(pack('f', connect.weight))
+
+                    f.write(pack('I', len(connect.name)))
+                    f.write(connect.name.encode('utf-8'))
+
+        f.close()
+
+    def load(self, filename):
+        f = open(filename, 'rb')
+
+        depth = unpack('I', f.read(4))[0]
+        size = unpack('I', f.read(4))[0]
+
+        self.hidden = HiddenLayout(size, depth)
+        for l in range(depth):
+            for n in range(size):
+                strSize = unpack('I', f.read(4))[0]
+                if strSize > 0:
+                    name = f.read(strSize)
+                    name = name.decode('utf-8')
+                    
+                    self.hidden.layouts[l].neurons[n].name = name
+
+        size = unpack('I', f.read(4))[0]
+
+        self.input = InputLayout(size, self.hidden)
+        for n in range(size):
+            strSize = unpack('I', f.read(4))[0]
+            if strSize > 0:
+                name = f.read(strSize)
+                name = name.decode('utf-8')
+                    
+                self.input.layout.neurons[n].name = name
+
+        size = unpack('I', f.read(4))[0]
+
+        self.output = ResultLayout(size, self.hidden)
+        for n in range(size):
+            strSize = unpack('I', f.read(4))[0]
+            if strSize > 0:
+                name = f.read(strSize)
+                name = name.decode('utf-8')
+                    
+                self.output.layout.neurons[n].name = name
+
+        for n in range(self.output.size):
+            for x in range(self.hidden.size):
+                weight = unpack('f', f.read(4))[0]
+                self.output.layout.neurons[n].connects[x].weight = weight
+
+                strSize = unpack('I', f.read(4))[0]
+                if strSize > 0:
+                    name = f.read(strSize)
+                    name = name.decode('utf-8')            
+                    self.output.layout.neurons[n].connects[x].name = name
+
+        for n in range(self.hidden.depth):
+            if n + 1 >= self.hidden.depth:
+                size = self.input.size
+            else:
+                size = self.hidden.size
+
+            for x in range(self.hidden.size):
+                for y in range(size):
+                    weight = unpack('f', f.read(4))[0]
+                    self.hidden.layouts[n].neurons[x].connects[y].weight = weight
+
+                    strSize = unpack('I', f.read(4))[0]
+                    if strSize > 0:
+                        name = f.read(strSize)
+                        name = name.decode('utf-8')            
+                        self.output.layout.neurons[n].connects[x].name = name
+
+        f.close()
+
     def mse(self, result, correct):
         mse = []
 
         if len(result) != len(correct):
-            return mse # error
+            return mse  # error
 
         for x in range(len(result)):
             mse.append(pow(correct[x] - result[x], 2) / 1)
 
         return mse
-    
+
     def setEA(self, E, A):
         self.E = E
         self.A = A
