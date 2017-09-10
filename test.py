@@ -6,7 +6,7 @@ class TestNeuralNetwork(unittest.TestCase):
 
     def test_xor(self):
         __nn = nn.NeuralNetwork(2, 1, 5, 1)
-        __nn.load('xor.nn')
+        __nn.load('xorF.nn')
 
         _test = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]]
 

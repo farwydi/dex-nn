@@ -1,12 +1,12 @@
 import nn
 
 # init
-_nn = nn.NeuralNetwork(2, 1, 2, 2)
+_nn = nn.NeuralNetwork(2, 1, 5, 2)
 _test = [[0, 0, 0], [0, 1, 1], [1, 0, 1], [1, 1, 0]]
 _nn.setEA(.15, .3)
 
 # leaning
-for epoch in range(15000):
+for epoch in range(20000):
     for params in _test:
         _nn.set([params[0], params[1]])
 
@@ -19,6 +19,8 @@ for epoch in range(15000):
         mse = mse[0]
 
         print('Error: ', round(mse * 100, 2))
+
+
 
 # e2e
 for params in _test:

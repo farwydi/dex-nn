@@ -1,0 +1,20 @@
+#pragma once
+#include "precompilation.h"
+
+class Connect
+{
+public:
+	Connect(Neuron *_base, Neuron *_way);
+	~Connect();
+
+	float echo(void);
+	void learning(float E, float A);
+
+	float weight;
+	string name;
+
+	Neuron *base;
+	Neuron *way;
+
+	float deltaWeight;
+};
