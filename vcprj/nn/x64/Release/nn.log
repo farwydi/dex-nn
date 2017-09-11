@@ -1,7 +1,0 @@
-﻿  test.cpp
-  Generating code
-  114 of 356 functions (32.0%) were compiled, the rest were copied from previous compilation.
-    4 functions were new in current compilation
-    31 functions had inline decision re-evaluated but remain unchanged
-  Finished generating code
-  nn.vcxproj -> D:\home\dex-nn\vcprj\x64\Release\nn.exe
