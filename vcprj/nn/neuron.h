@@ -15,6 +15,9 @@ public:
     void learning();
     NN_POINT calcInput();
 
+    vector<NN_POINT> getWeights();
+    void restore(vector<NN_POINT> weights);
+
     NN_POINT getDelta() const { return delta; }
     NN_POINT getPower() const { return power; }
 
@@ -26,7 +29,7 @@ public:
 
     char *name;
 
-    // private:
+private:
     NN_POINT delta;
     NN_POINT power;
 

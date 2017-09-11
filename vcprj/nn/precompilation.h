@@ -6,6 +6,7 @@
 #include <string>
 #include <cstring>
 #include <vector>
+#include <fstream>
 
 class Connect;
 class Neuron;
@@ -22,24 +23,22 @@ enum NeuronType
     HIDDEN
 };
 
-// static const char *NeuronTypeStrings[] = {"INPUT", "OUTPUT", "HIDDEN"};
-
 #define USE_LIMITER_CONNECTER 0
 
 #if USE_LIMITER_CONNECTER == 1
-#define COUNT_CONNECTS 3
+const int COUNT_CONNECTS = 3;
 #endif // USE_LIMITER_CONNECTER == 1
 
-#define HIDDEN_DEPTH 1
-#define HIDDEN_SIZE 3
+const int HIDDEN_DEPTH = 1;
+const int HIDDEN_SIZE = 3;
 
-#define INPUT_SIZE 2
-#define OUTPUT_SIZE 1
-
-#define LEARNING_TIME .15f
-#define FORCE_ALPHA .3f
+const int INPUT_SIZE = 2;
+const int OUTPUT_SIZE = 1;
 
 #define NN_POINT float
+
+const NN_POINT LEARNING_TIME = .15f;
+const NN_POINT FORCE_ALPHA = .3f;
 
 // #define USE_NORMALIZE_FUNC 0
 

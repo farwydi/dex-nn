@@ -11,10 +11,12 @@ public:
     NN_POINT calcPotential();
     void learning();
 
+    void loadWeight(NN_POINT _weight) { weight = _weight; }
+
     NN_POINT getWeight() const { return weight; }
     Neuron *getWay() const { return way; }
 
-    // private:
+private:
     NN_POINT weight;
     NN_POINT deltaWeight;
 

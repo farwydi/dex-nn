@@ -12,15 +12,15 @@ public:
 
     array<float, OUTPUT_SIZE> result(bool _calc = true);
 
-    void save();
-    void load();
+    void save(string name);
+    void load(string name);
 
     array<float, OUTPUT_SIZE> mse(array<float, OUTPUT_SIZE> result,
                                   array<float, OUTPUT_SIZE> correct);
 
     array<float, OUTPUT_SIZE> learning(array<float, OUTPUT_SIZE> correct);
 
-    // private:
+private:
     void calc();
     NN_POINT normalize(NN_POINT x);
 

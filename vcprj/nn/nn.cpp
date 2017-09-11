@@ -80,9 +80,60 @@ array<float, OUTPUT_SIZE> NeuralNetwork::result(bool _calc)
     return result;
 }
 
-void NeuralNetwork::save() {}
+void NeuralNetwork::save(string name)
+{
+    ofstream f(name, ofstream::binary);
 
-void NeuralNetwork::load() {}
+    f.write(reinterpret_cast<const char *>(&HIDDEN_DEPTH), 4);
+    f.write(reinterpret_cast<const char *>(&HIDDEN_SIZE), 4);
+    f.write(reinterpret_cast<const char *>(&INPUT_SIZE), 4);
+    f.write(reinterpret_cast<const char *>(&OUTPUT_SIZE), 4);
+
+    for (auto neuron : output) {
+        auto weights = neuron->getWeights();
+        f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+        f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
+    }
+
+    for (auto depth : hidden) {
+        for (auto neuron : depth) {
+            auto weights = neuron->getWeights();
+            f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+            f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
+        }
+    }
+
+    f.close();
+}
+
+void NeuralNetwork::load(string name)
+{
+    ifstream f(name, ifstream::binary);
+
+    int hiddenDepth;
+    f.read(reinterpret_cast<char *>(&hiddenDepth), 4);
+
+    int hiddenSize;
+    f.read(reinterpret_cast<char *>(&hiddenSize), 4);
+
+    int inputSize;
+    f.read(reinterpret_cast<char *>(&inputSize), 4);
+
+    int outputSize;
+    f.read(reinterpret_cast<char *>(&outputSize), 4);
+
+    for (int i = 0; i < outputSize; i++) {
+        unsigned int size;
+        f.read(reinterpret_cast<char *>(&size), 4);
+
+        vector<NN_POINT> weights(size);
+        f.read(reinterpret_cast<char *>(weights.data()), size);
+
+        output[i]->restore(weights);
+    }
+
+    f.close();
+}
 
 array<float, OUTPUT_SIZE> NeuralNetwork::mse(array<float, OUTPUT_SIZE> result,
                                              array<float, OUTPUT_SIZE> correct)

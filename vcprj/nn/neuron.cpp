@@ -19,6 +19,28 @@ Neuron::Neuron(const NeuronType _type, size_t countConnects, size_t countBacks, 
 
 Neuron::~Neuron() {}
 
+vector<NN_POINT> Neuron::getWeights()
+{
+    vector<NN_POINT> result;
+
+    for (auto connect : connects) {
+        result.push_back(connect->getWeight());
+    }
+
+    return result;
+}
+
+void Neuron::restore(vector<NN_POINT> weights)
+{
+    if (weights.count() != connects.count()) {
+        return; // error
+    }
+
+    for (int i = 0; i < connects.count(); i++) {
+        connects[i]->loadWeight(weights[i]);
+    }
+}
+
 void Neuron::addConnect(Connect *to)
 {
     connects.push_back(to);
