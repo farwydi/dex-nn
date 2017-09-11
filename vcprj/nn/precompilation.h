@@ -31,12 +31,12 @@ enum NeuronType
 #endif // USE_LIMITER_CONNECTER == 1
 
 #define HIDDEN_DEPTH 1
-#define HIDDEN_SIZE 2
+#define HIDDEN_SIZE 3
 
 #define INPUT_SIZE 2
 #define OUTPUT_SIZE 1
 
-#define LEARNING_TIME .7f
+#define LEARNING_TIME .15f
 #define FORCE_ALPHA .3f
 
 #define NN_POINT float

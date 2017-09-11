@@ -45,7 +45,7 @@ int main()
     array<NN_POINT, INPUT_SIZE> sets;
     array<NN_POINT, OUTPUT_SIZE> corrects;
 
-    for (auto epoch = 0; epoch < 8000; epoch++) {
+    for (auto epoch = 0; epoch < 80000; epoch++) {
         for (auto params : _test) {
             sets[0] = params[0];
             sets[1] = params[1];
