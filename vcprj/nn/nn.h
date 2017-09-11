@@ -5,26 +5,26 @@
 class NeuralNetwork
 {
 public:
-	NeuralNetwork(unsigned short sizeInput, unsigned short sizeOutput, unsigned short sizeHidden, unsigned short depthHidden);
-	~NeuralNetwork();
+    NeuralNetwork();
+    ~NeuralNetwork();
 
-	void set(float *params, unsigned int paramsSize);
+    void set(array<float, INPUT_SIZE> params);
 
-	float *result();
+    array<float, OUTPUT_SIZE> result(bool _calc = true);
 
-	void save();
-	void load();
+    void save();
+    void load();
 
-	float *mse(float *result, size_t resultSize, float *correct, size_t correctSize);
+    array<float, OUTPUT_SIZE> mse(array<float, OUTPUT_SIZE> result,
+                                  array<float, OUTPUT_SIZE> correct);
 
-	void setEA(float E, float A);
+    array<float, OUTPUT_SIZE> learning(array<float, OUTPUT_SIZE> correct);
 
-	void learning(float *correct, size_t correctSize);
+    // private:
+    void calc();
+    NN_POINT normalize(NN_POINT x);
 
-	HiddenLayout *hidden;
-	ResultLayout *output;
-	InputLayout *input;
-
-	float E;
-	float A;
+    array<Neuron *, INPUT_SIZE> input;
+    array<array<Neuron *, HIDDEN_SIZE>, HIDDEN_DEPTH> hidden;
+    array<Neuron *, OUTPUT_SIZE> output;
 };

@@ -1,43 +1,68 @@
 #include "neuron.h"
 #include "connect.h"
 
-Neuron::Neuron(const NeuronType _type, int id, const string levelPrefix)
-	: type(_type)
+Neuron::Neuron(const NeuronType _type, size_t countConnects, size_t countBacks, unsigned short id,
+               string levelPrefix)
+    : type(_type)
 {
-	power = .0f;
-	delta = .0f;
-	name = NeuronTypeStrings[_type] + levelPrefix + '_' + to_string(id);
+    connects.reserve(countConnects);
+    backs.reserve(countBacks);
+
+    power = .0f;
+    delta = .0f;
+
+    auto _name = levelPrefix + string("_") + to_string(id);
+
+    name = new char[_name.length() + 1];
+    strcpy(name, _name.c_str());
 }
 
-Neuron::~Neuron()
-{
-}
+Neuron::~Neuron() {}
 
 void Neuron::addConnect(Connect *to)
 {
-	connects.push_back(to);
+    connects.push_back(to);
 }
 
 void Neuron::addBack(Neuron *to)
 {
-	backs.push_back(to);
+    backs.push_back(to);
 }
 
-void Neuron::learning(float E, float A)
+NN_POINT Neuron::getBackPotential()
 {
-	for (auto connect : connects)
-	{
-		connect->learning(E, A);
-	}
+    NN_POINT potential = 0;
+    for (auto back : backs) {
+        potential += back->getDirectionPotential(this);
+    }
+
+    return potential;
 }
 
-float Neuron::sum()
+NN_POINT Neuron::getDirectionPotential(Neuron *to)
 {
-	float r = .0f;
-	for (auto connect : connects)
-	{
-		r += connect->echo();
-	}
+    for (auto connect : connects) {
+        if (connect->getWay() == to) {
+            return delta * connect->getWeight();
+        }
+    }
 
-	return r;
+    return 0;
+}
+
+void Neuron::learning()
+{
+    for (auto connect : connects) {
+        connect->learning();
+    }
+}
+
+NN_POINT Neuron::calcInput()
+{
+    NN_POINT r = 0;
+    for (auto connect : connects) {
+        r += connect->calcPotential();
+    }
+
+    return r;
 }

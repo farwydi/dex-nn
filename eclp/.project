@@ -36,36 +36,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/connect.h</locationURI>
 		</link>
 		<link>
-			<name>hidden.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/hidden.cpp</locationURI>
-		</link>
-		<link>
-			<name>hidden.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/hidden.h</locationURI>
-		</link>
-		<link>
-			<name>input.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/input.cpp</locationURI>
-		</link>
-		<link>
-			<name>input.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/input.h</locationURI>
-		</link>
-		<link>
-			<name>layout.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/layout.cpp</locationURI>
-		</link>
-		<link>
-			<name>layout.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/layout.h</locationURI>
-		</link>
-		<link>
 			<name>neuron.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/neuron.cpp</locationURI>
@@ -86,16 +56,6 @@
 			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/nn.h</locationURI>
 		</link>
 		<link>
-			<name>output.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/output.cpp</locationURI>
-		</link>
-		<link>
-			<name>output.h</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/output.h</locationURI>
-		</link>
-		<link>
 			<name>precompilation.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/precompilation.h</locationURI>
@@ -103,7 +63,7 @@
 		<link>
 			<name>t.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/vcprj/nn/t.cpp</locationURI>
+			<location>C:/Users/zharikov/icddex/dn/vcprj/nn/t.cpp</location>
 		</link>
 		<link>
 			<name>test.cpp</name>

@@ -4,6 +4,7 @@
 #include <cmath>
 #include <map>
 #include <string>
+#include <cstring>
 #include <vector>
 
 class Connect;
@@ -21,7 +22,7 @@ enum NeuronType
     HIDDEN
 };
 
-static const char *NeuronTypeStrings[] = {"INPUT", "OUTPUT", "HIDDEN"};
+// static const char *NeuronTypeStrings[] = {"INPUT", "OUTPUT", "HIDDEN"};
 
 #define USE_LIMITER_CONNECTER 0
 
@@ -30,9 +31,16 @@ static const char *NeuronTypeStrings[] = {"INPUT", "OUTPUT", "HIDDEN"};
 #endif // USE_LIMITER_CONNECTER == 1
 
 #define HIDDEN_DEPTH 1
-#define HIDDEN_SIZE 5
+#define HIDDEN_SIZE 2
 
 #define INPUT_SIZE 2
 #define OUTPUT_SIZE 1
+
+#define LEARNING_TIME .7f
+#define FORCE_ALPHA .3f
+
+#define NN_POINT float
+
+// #define USE_NORMALIZE_FUNC 0
 
 using namespace std;

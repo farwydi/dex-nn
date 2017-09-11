@@ -1,77 +1,150 @@
 #include "nn.h"
-#include "hidden.h"
-#include "input.h"
-#include "output.h"
+#include "neuron.h"
+#include "connect.h"
 
-NeuralNetwork::NeuralNetwork(unsigned short sizeInput, unsigned short sizeOutput, unsigned short sizeHidden, unsigned short depthHidden)
+NeuralNetwork::NeuralNetwork()
 {
-	hidden = new HiddenLayout(sizeHidden, depthHidden);
-	input = new InputLayout(sizeInput, hidden);
-	output = new ResultLayout(sizeOutput, hidden);
+    for (size_t i = 0; i < HIDDEN_DEPTH; i++) {
+        for (size_t n = 0; n < HIDDEN_SIZE; n++) {
+            hidden[i][n] = new Neuron(NeuronType::HIDDEN, ((i == 0) ? INPUT_SIZE : HIDDEN_SIZE),
+                                      ((i == HIDDEN_DEPTH) ? OUTPUT_SIZE : HIDDEN_SIZE), n,
+                                      "HIDDEN_" + to_string(i));
+        }
+    }
 
-	E = .7f;
-	A = .3f;
+    for (size_t n = 0; n < INPUT_SIZE; n++) {
+        input[n] = new Neuron(NeuronType::INPUT, 0, HIDDEN_SIZE, n, "INPUT");
+    }
+
+    for (size_t n = 0; n < OUTPUT_SIZE; n++) {
+        output[n] = new Neuron(NeuronType::OUTPUT, HIDDEN_SIZE, 0, n, "OUTPUT");
+    }
+
+    for (auto hiddenNeuron : hidden[0]) {
+        for (auto inputNeuron : input) {
+            hiddenNeuron->addConnect(new Connect(hiddenNeuron, inputNeuron));
+            inputNeuron->addBack(hiddenNeuron);
+        }
+    }
+
+#if HIDDEN_DEPTH > 1
+    size_t offset = 1;
+    auto tail = hidden[offset];
+    while (true) {
+        auto front = hidden[offset - 1];
+
+        for (auto tailNeuron : tail) {
+            for (auto frontNeuron : front) {
+                tailNeuron->addConnect(new Connect(tailNeuron, frontNeuron));
+                frontNeuron->addBack(tailNeuron);
+            }
+        }
+
+        offset += 1;
+
+        if (offset >= HIDDEN_DEPTH) {
+            break;
+        }
+    }
+#endif
+
+    for (auto outputNeuron : output) {
+        for (auto hiddenNeuron : hidden[HIDDEN_DEPTH - 1]) {
+            outputNeuron->addConnect(new Connect(outputNeuron, hiddenNeuron));
+            hiddenNeuron->addBack(outputNeuron);
+        }
+    }
 }
 
-NeuralNetwork::~NeuralNetwork()
+NeuralNetwork::~NeuralNetwork() {}
+
+void NeuralNetwork::set(array<float, INPUT_SIZE> params)
 {
+    for (size_t i = 0; i < INPUT_SIZE; i++) {
+        input[i]->setPower(params[i]);
+    }
 }
 
-void NeuralNetwork::set(float * params, unsigned int paramsSize)
+array<float, OUTPUT_SIZE> NeuralNetwork::result(bool _calc)
 {
-	if (paramsSize != input->size) {
-		return;
-	}
+    array<float, OUTPUT_SIZE> result;
 
-	for (unsigned int n = 0; n < paramsSize; n++) {
-		input->set(n, params[n]);
-	}
+    if (_calc) {
+        calc();
+    }
+
+    for (size_t i = 0; i < OUTPUT_SIZE; i++) {
+        result[i] = output[i]->getPower();
+    }
+
+    return result;
 }
 
-float * NeuralNetwork::result()
-{
-	hidden->calc();
+void NeuralNetwork::save() {}
 
-	return output->result();
+void NeuralNetwork::load() {}
+
+array<float, OUTPUT_SIZE> NeuralNetwork::mse(array<float, OUTPUT_SIZE> result,
+                                             array<float, OUTPUT_SIZE> correct)
+{
+    array<float, OUTPUT_SIZE> mse;
+
+    for (size_t n = 0; n < OUTPUT_SIZE; n++) {
+        mse[n] = pow(correct[n] - result[n], 2) / 1;
+    }
+
+    return mse;
 }
 
-void NeuralNetwork::save()
+array<float, OUTPUT_SIZE> NeuralNetwork::learning(array<float, OUTPUT_SIZE> correct)
 {
+    calc();
+
+    for (int n = 0; n < OUTPUT_SIZE; n++) {
+        output[n]->setDelta((correct[n] - output[n]->getPower()) *
+                            ((1 - output[n]->getPower()) * output[n]->getPower()));
+    }
+
+    for (int i = HIDDEN_DEPTH - 1; i >= 0; i--) {
+        for (int n = 0; n < HIDDEN_SIZE; n++) {
+            NN_POINT potential = hidden[i][n]->getBackPotential();
+
+            hidden[i][n]->setDelta(((1 - hidden[i][n]->getPower()) * hidden[i][n]->getPower()) *
+                                   potential);
+        }
+    }
+
+    for (auto neuron : output) {
+        neuron->learning();
+    }
+
+    for (auto depth : hidden) {
+        for (auto neuron : depth) {
+            neuron->learning();
+        }
+    }
+
+    for (auto neuron : input) {
+        neuron->learning();
+    }
+
+    return result();
 }
 
-void NeuralNetwork::load()
+NN_POINT NeuralNetwork::normalize(NN_POINT x)
 {
+    return 1 / (1 + exp(-1 * x));
 }
 
-float * NeuralNetwork::mse(float * result, size_t resultSize, float * correct, size_t correctSize)
+void NeuralNetwork::calc()
 {
-	if (resultSize != correctSize) {
-		return nullptr;
-	}
+    for (auto depth : hidden) {
+        for (auto neuron : depth) {
+            neuron->setPower(normalize(neuron->calcInput()));
+        }
+    }
 
-	float *mse = new float[resultSize];
-
-	for (unsigned int n = 0; n < resultSize; n++) {
-		mse[n] = pow(correct[n] - result[n], 2) / 1;
-	}
-
-	return mse;
-}
-
-void NeuralNetwork::setEA(float _E, float _A)
-{
-	E = _E;
-	A = _A;
-}
-
-void NeuralNetwork::learning(float * correct, size_t correctSize)
-{
-	if (correctSize > output->size) {
-		return; // error
-	}
-
-	hidden->calc();
-	output->learning(correct, correctSize, E, A);
-	hidden->learning(E, A);
-	input->learning(E, A);
+    for (auto neuron : output) {
+        neuron->setPower(normalize(neuron->calcInput()));
+    }
 }
