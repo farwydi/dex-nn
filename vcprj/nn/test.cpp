@@ -1,14 +1,16 @@
+#include "precompilation.h"
+
 #include "connect.h"
 #include "nn.h"
 
 #include <iostream>
 
-void main()
+int main()
 {
-	//# init
+	// init
 	auto _nn = new NeuralNetwork(2, 1, 3, 1);
 
-	array<array<float, 3>, 4 > _test;
+	array<array<float, 3>, 4> _test;
 	_test[0][0] = .0f;
 	_test[0][1] = .0f;
 	_test[0][2] = .0f;
@@ -31,9 +33,10 @@ void main()
 	float *sets = new float[2];
 	float *corrects = new float[1];
 
-	for (auto epoch = 0; epoch < 80000; epoch++) {
-		for (auto params : _test) {
-
+	for (auto epoch = 0; epoch < 80000; epoch++)
+	{
+		for (auto params : _test)
+		{
 			sets[0] = params[0];
 			sets[1] = params[1];
 			_nn->set(sets, 2);
@@ -51,5 +54,5 @@ void main()
 		}
 	}
 
-	system("PAUSE");
+	return 0;
 }
