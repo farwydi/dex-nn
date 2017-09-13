@@ -32,13 +32,13 @@ vector<NN_POINT> Neuron::getWeights()
 
 void Neuron::restore(vector<NN_POINT> weights)
 {
-    if (weights.count() != connects.count()) {
-        return; // error
-    }
-
-    for (int i = 0; i < connects.count(); i++) {
-        connects[i]->loadWeight(weights[i]);
-    }
+//    if (weights.count() != connects.count()) {
+//        return; // error
+//    }
+//
+//    for (int i = 0; i < connects.count(); i++) {
+//        connects[i]->loadWeight(weights[i]);
+//    }
 }
 
 void Neuron::addConnect(Connect *to)

@@ -1,3 +1,5 @@
+#include "precompilation.h"
+
 #include "nn.h"
 
 #include <iostream>

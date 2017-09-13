@@ -91,14 +91,14 @@ void NeuralNetwork::save(string name)
 
     for (auto neuron : output) {
         auto weights = neuron->getWeights();
-        f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+//        f.write(reinterpret_cast<const char *>(&weights.size()), 4);
         f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
     }
 
     for (auto depth : hidden) {
         for (auto neuron : depth) {
             auto weights = neuron->getWeights();
-            f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+//            f.write(reinterpret_cast<const char *>(&weights.size()), 4);
             f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
         }
     }
