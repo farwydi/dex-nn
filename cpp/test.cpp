@@ -1,30 +1,10 @@
-#include "precompilation.h"
-
-#include "nn.h"
+#include "feed_forward.h"
 
 #include <iostream>
 
-#undef LEARNING_TIME
-#define LEARNING_TIME .15f
-
-#undef FORCE_ALPHA
-#define FORCE_ALPHA .3f
-
-#undef INPUT_SIZE
-#define INPUT_SIZE 2
-
-#undef HIDDEN_DEPTH
-#define HIDDEN_DEPTH 1
-
-#undef HIDDEN_SIZE
-#define HIDDEN_SIZE 3
-
-#undef OUTPUT_SIZE
-#define OUTPUT_SIZE 1
-
 int main()
 {
-    auto _nn = new NeuralNetwork();
+    auto _nn = new FeedForwardNeuralNetwork();
 
     array<array<NN_POINT, INPUT_SIZE + 1>, 4> _test;
     _test[0][0] = .0f;
@@ -47,7 +27,7 @@ int main()
     array<NN_POINT, INPUT_SIZE> sets;
     array<NN_POINT, OUTPUT_SIZE> corrects;
 
-    for (auto epoch = 0; epoch < 800; epoch++) {
+    for (auto epoch = 0; epoch < 80000; epoch++) {
         for (auto params : _test) {
             sets[0] = params[0];
             sets[1] = params[1];
@@ -61,8 +41,8 @@ int main()
         }
     }
 
-    _nn->save("xor.nn");
-    _nn->load("xor.nn");
+//    _nn->save("xor.nn");
+//    _nn->load("xor.nn");
 
     return 0;
 }

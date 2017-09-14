@@ -2,11 +2,11 @@
 
 #include "precompilation.h"
 
-class NeuralNetwork
+class FeedForwardNeuralNetwork
 {
 public:
-    NeuralNetwork();
-    ~NeuralNetwork();
+    FeedForwardNeuralNetwork();
+    ~FeedForwardNeuralNetwork();
 
     void set(array<float, INPUT_SIZE> params);
 
@@ -15,8 +15,7 @@ public:
     void save(string name);
     void load(string name);
 
-    array<float, OUTPUT_SIZE> mse(array<float, OUTPUT_SIZE> result,
-                                  array<float, OUTPUT_SIZE> correct);
+    array<float, OUTPUT_SIZE> mse(array<float, OUTPUT_SIZE> result, array<float, OUTPUT_SIZE> correct);
 
     array<float, OUTPUT_SIZE> learning(array<float, OUTPUT_SIZE> correct);
 

@@ -22,6 +22,4 @@ private:
 
     Neuron *base;
     Neuron *way;
-
-    char *name;
 };

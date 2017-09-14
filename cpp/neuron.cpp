@@ -1,23 +1,18 @@
 #include "neuron.h"
 #include "connect.h"
 
-Neuron::Neuron(const NeuronType _type, size_t countConnects, size_t countBacks, unsigned short id,
-               string levelPrefix)
-    : type(_type)
+Neuron::Neuron(unsigned int countConnects, unsigned int countBacks)
 {
     connects.reserve(countConnects);
     backs.reserve(countBacks);
 
     power = .0f;
     delta = .0f;
-
-    auto _name = levelPrefix + string("_") + to_string(id);
-
-    name = new char[_name.length() + 1];
-    strcpy(name, _name.c_str());
 }
 
-Neuron::~Neuron() {}
+Neuron::~Neuron()
+{
+}
 
 vector<NN_POINT> Neuron::getWeights()
 {
@@ -32,13 +27,13 @@ vector<NN_POINT> Neuron::getWeights()
 
 void Neuron::restore(vector<NN_POINT> weights)
 {
-//    if (weights.count() != connects.count()) {
-//        return; // error
-//    }
-//
-//    for (int i = 0; i < connects.count(); i++) {
-//        connects[i]->loadWeight(weights[i]);
-//    }
+    //    if (weights.count() != connects.count()) {
+    //        return; // error
+    //    }
+    //
+    //    for (int i = 0; i < connects.count(); i++) {
+    //        connects[i]->loadWeight(weights[i]);
+    //    }
 }
 
 void Neuron::addConnect(Connect *to)

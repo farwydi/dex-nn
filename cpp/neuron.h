@@ -5,8 +5,7 @@
 class Neuron
 {
 public:
-    Neuron(const NeuronType type, size_t countConnects, size_t countBacks, unsigned short id = 0,
-           string levelPrefix = "");
+    Neuron(unsigned int countConnects, unsigned int countBacks);
     ~Neuron();
 
     void addConnect(Connect *to);
@@ -27,14 +26,10 @@ public:
     NN_POINT getBackPotential();
     NN_POINT getDirectionPotential(Neuron *to);
 
-    char *name;
-
 private:
     NN_POINT delta;
     NN_POINT power;
 
     vector<Connect *> connects;
     vector<Neuron *> backs;
-
-    const NeuronType type;
 };

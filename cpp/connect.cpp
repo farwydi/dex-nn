@@ -5,14 +5,11 @@ Connect::Connect(Neuron *_base, Neuron *_way) : base(_base), way(_way)
 {
     deltaWeight = .0f;
     weight = static_cast<NN_POINT>(rand()) / static_cast<NN_POINT>(RAND_MAX);
-
-    auto _name = string("CONNECT_") + string(base->name) + string("_TO_") + string(way->name);
-
-    name = new char[_name.length() + 1];
-    strcpy(name, _name.c_str());
 }
 
-Connect::~Connect() {}
+Connect::~Connect()
+{
+}
 
 NN_POINT Connect::calcPotential()
 {

@@ -1,23 +1,22 @@
-#include "nn.h"
+#include "feed_forward.h"
 #include "neuron.h"
 #include "connect.h"
 
-NeuralNetwork::NeuralNetwork()
+FeedForwardNeuralNetwork::FeedForwardNeuralNetwork()
 {
-    for (size_t i = 0; i < HIDDEN_DEPTH; i++) {
-        for (size_t n = 0; n < HIDDEN_SIZE; n++) {
-            hidden[i][n] = new Neuron(NeuronType::HIDDEN, ((i == 0) ? INPUT_SIZE : HIDDEN_SIZE),
-                                      ((i == HIDDEN_DEPTH) ? OUTPUT_SIZE : HIDDEN_SIZE), n,
-                                      "HIDDEN_" + to_string(i));
+    for (unsigned int i = 0; i < HIDDEN_DEPTH; i++) {
+        for (unsigned int n = 0; n < HIDDEN_SIZE; n++) {
+            hidden[i][n] = new Neuron(((i == 0) ? INPUT_SIZE : HIDDEN_SIZE),
+                                      ((i == HIDDEN_DEPTH) ? OUTPUT_SIZE : HIDDEN_SIZE));
         }
     }
 
-    for (size_t n = 0; n < INPUT_SIZE; n++) {
-        input[n] = new Neuron(NeuronType::INPUT, 0, HIDDEN_SIZE, n, "INPUT");
+    for (unsigned int n = 0; n < INPUT_SIZE; n++) {
+        input[n] = new Neuron(0, HIDDEN_SIZE);
     }
 
-    for (size_t n = 0; n < OUTPUT_SIZE; n++) {
-        output[n] = new Neuron(NeuronType::OUTPUT, HIDDEN_SIZE, 0, n, "OUTPUT");
+    for (unsigned int n = 0; n < OUTPUT_SIZE; n++) {
+        output[n] = new Neuron(HIDDEN_SIZE, 0);
     }
 
     for (auto hiddenNeuron : hidden[0]) {
@@ -28,7 +27,7 @@ NeuralNetwork::NeuralNetwork()
     }
 
 #if HIDDEN_DEPTH > 1
-    size_t offset = 1;
+    unsigned int offset = 1;
     auto tail = hidden[offset];
     while (true) {
         auto front = hidden[offset - 1];
@@ -56,16 +55,18 @@ NeuralNetwork::NeuralNetwork()
     }
 }
 
-NeuralNetwork::~NeuralNetwork() {}
-
-void NeuralNetwork::set(array<float, INPUT_SIZE> params)
+FeedForwardNeuralNetwork::~FeedForwardNeuralNetwork()
 {
-    for (size_t i = 0; i < INPUT_SIZE; i++) {
+}
+
+void FeedForwardNeuralNetwork::set(array<float, INPUT_SIZE> params)
+{
+    for (unsigned int i = 0; i < INPUT_SIZE; i++) {
         input[i]->setPower(params[i]);
     }
 }
 
-array<float, OUTPUT_SIZE> NeuralNetwork::result(bool _calc)
+array<float, OUTPUT_SIZE> FeedForwardNeuralNetwork::result(bool _calc)
 {
     array<float, OUTPUT_SIZE> result;
 
@@ -73,14 +74,14 @@ array<float, OUTPUT_SIZE> NeuralNetwork::result(bool _calc)
         calc();
     }
 
-    for (size_t i = 0; i < OUTPUT_SIZE; i++) {
+    for (unsigned int i = 0; i < OUTPUT_SIZE; i++) {
         result[i] = output[i]->getPower();
     }
 
     return result;
 }
 
-void NeuralNetwork::save(string name)
+void FeedForwardNeuralNetwork::save(string name)
 {
     ofstream f(name, ofstream::binary);
 
@@ -91,14 +92,14 @@ void NeuralNetwork::save(string name)
 
     for (auto neuron : output) {
         auto weights = neuron->getWeights();
-//        f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+        //        f.write(reinterpret_cast<const char *>(&weights.size()), 4);
         f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
     }
 
     for (auto depth : hidden) {
         for (auto neuron : depth) {
             auto weights = neuron->getWeights();
-//            f.write(reinterpret_cast<const char *>(&weights.size()), 4);
+            //            f.write(reinterpret_cast<const char *>(&weights.size()), 4);
             f.write(reinterpret_cast<const char *>(weights.data()), weights.size());
         }
     }
@@ -106,7 +107,7 @@ void NeuralNetwork::save(string name)
     f.close();
 }
 
-void NeuralNetwork::load(string name)
+void FeedForwardNeuralNetwork::load(string name)
 {
     ifstream f(name, ifstream::binary);
 
@@ -135,19 +136,19 @@ void NeuralNetwork::load(string name)
     f.close();
 }
 
-array<float, OUTPUT_SIZE> NeuralNetwork::mse(array<float, OUTPUT_SIZE> result,
-                                             array<float, OUTPUT_SIZE> correct)
+array<float, OUTPUT_SIZE> FeedForwardNeuralNetwork::mse(array<float, OUTPUT_SIZE> result,
+                                                        array<float, OUTPUT_SIZE> correct)
 {
     array<float, OUTPUT_SIZE> mse;
 
-    for (size_t n = 0; n < OUTPUT_SIZE; n++) {
+    for (unsigned int n = 0; n < OUTPUT_SIZE; n++) {
         mse[n] = pow(correct[n] - result[n], 2) / 1;
     }
 
     return mse;
 }
 
-array<float, OUTPUT_SIZE> NeuralNetwork::learning(array<float, OUTPUT_SIZE> correct)
+array<float, OUTPUT_SIZE> FeedForwardNeuralNetwork::learning(array<float, OUTPUT_SIZE> correct)
 {
     calc();
 
@@ -182,12 +183,12 @@ array<float, OUTPUT_SIZE> NeuralNetwork::learning(array<float, OUTPUT_SIZE> corr
     return result();
 }
 
-NN_POINT NeuralNetwork::normalize(NN_POINT x)
+NN_POINT FeedForwardNeuralNetwork::normalize(NN_POINT x)
 {
     return 1 / (1 + exp(-1 * x));
 }
 
-void NeuralNetwork::calc()
+void FeedForwardNeuralNetwork::calc()
 {
     for (auto depth : hidden) {
         for (auto neuron : depth) {

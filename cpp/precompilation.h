@@ -10,18 +10,7 @@
 
 class Connect;
 class Neuron;
-class Layout;
-class HiddenLayout;
-class InputLayout;
-class ResultLayout;
-class NeuralNetwork;
-
-enum NeuronType
-{
-    INPUT,
-    OUTPUT,
-    HIDDEN
-};
+class FeedForwardNeuralNetwork;
 
 #define USE_LIMITER_CONNECTER 0
 
@@ -30,10 +19,10 @@ const int COUNT_CONNECTS = 3;
 #endif // USE_LIMITER_CONNECTER == 1
 
 const int HIDDEN_DEPTH = 1;
-const int HIDDEN_SIZE = 48;
+const int HIDDEN_SIZE = 3;
 
-const int INPUT_SIZE = 32;
-const int OUTPUT_SIZE = 28;
+const int INPUT_SIZE = 2;
+const int OUTPUT_SIZE = 1;
 
 #define NN_POINT float
 
