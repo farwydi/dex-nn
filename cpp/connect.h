@@ -1,19 +1,27 @@
 #pragma once
+
 #include "precompilation.h"
 
 class Connect
 {
 public:
-	Connect(Neuron *_base, Neuron *_way);
-	~Connect();
+    Connect(Neuron *_base, Neuron *_way);
+    ~Connect();
 
-	float echo(void);
-	void learning(float E, float A);
+    NN_POINT calcPotential();
+    void learning();
+
+    void loadWeight(NN_POINT _weight) { weight = _weight; }
+
+    NN_POINT getWeight() const { return weight; }
+    Neuron *getWay() const { return way; }
 
 private:
-	float weight;
-	float deltaWeight;
+    NN_POINT weight;
+    NN_POINT deltaWeight;
 
-	Neuron *base;
-	Neuron *way;
+    Neuron *base;
+    Neuron *way;
+
+    char *name;
 };
