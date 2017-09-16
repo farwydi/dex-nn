@@ -25,7 +25,8 @@ model.compile(loss="categorical_crossentropy",
 
 print(model.summary())
 
-model.fit(x_train, y_train, validation_split=0.2, batch_size=200, epochs=100, verbose=1)
+model.fit(x_train, y_train, validation_split=0.2,
+          batch_size=200, epochs=100, verbose=1)
 
 model_json = model.to_json()
 json_file = open("mnist_model.json", "w")
