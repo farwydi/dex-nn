@@ -74,13 +74,16 @@ class Player(controller.Object):
         self.score = 0
 
     def draw(self):
-        text = self.name + '    ' + str(self.health) + '   ' + str(self.score)
+        text = self.name + '        ' + \
+            str(self.health) + '   ' + str(self.score)
         self.gm.drawText(text, self.offset, self.color)
-        self.gm.drawLine(tuple(self.position), tuple(
-            self._move(None, self.position, self.rotation, 15)), self.color)
-        self.gm.drawCircle(tuple(self.position), self.size, self.color)
-        self.gm.drawCircle(tuple(self.position), self.size +
-                           config.PLAYER_VISION, self.color, 1)
+
+        if not self.death:
+            self.gm.drawLine(tuple(self.position), tuple(
+                self._move(None, self.position, self.rotation, 15)), self.color)
+            self.gm.drawCircle(tuple(self.position), self.size, self.color)
+            self.gm.drawCircle(tuple(self.position), self.size +
+                               config.PLAYER_VISION, self.color, 1)
 
     def life(self):
         if not self.death:
@@ -90,14 +93,17 @@ class Player(controller.Object):
     def eat(self):
         (wall, posion, food) = self.manager.getVision(self)
         if not posion == None:
-            self.reInit()
+            self.death = True
+            self.health = -1
             posion.reInit()
+            print(self.name, 'eat poison! and death :(')
             return True
 
         if not food == None:
             self.health += 100
             food.reInit()
             self.score += config.SCORE * 10
+            print(self.name, 'eat food! +100 HP')
             return True
 
         self.health -= config.PLAYER_COST_STEP * 5
@@ -114,6 +120,7 @@ class Player(controller.Object):
         if not posion == None:
             self.manager.poison2Food(posion)
             self.score += config.SCORE * 5
+            print(self.name, 'fix poison! +5 SCORE')
             return True
 
         return False
@@ -126,7 +133,7 @@ class Player(controller.Object):
         (wall, posion, food) = self.manager.getVision(self)
         if wall == 1:
             return False
-        
+
         self.score += config.SCORE
         super().move()
 

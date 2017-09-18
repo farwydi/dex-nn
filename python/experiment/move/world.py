@@ -57,13 +57,17 @@ def cycle(n):
             manager.action()
             manager.drawAll()
 
-            if cv2.waitKey(50) & 0xFF == ord('q'):
+            if cv2.waitKey(config.DELAY) & 0xFF == ord('q'):
                 return True
 
         gm.print()
 
-    players.sort(key=lambda x: x.score, reverse=True)
-    players[0].sex(players[1], players[3])
+    if not config.REAL_MODE:
+        players.sort(key=lambda x: x.score, reverse=True)
+        players[0].sex(players[1], players[3])
+
+    for p in players:
+        print(p.name, ':', p.score)
 
     manager.reInitWorld()
     gm.zero()

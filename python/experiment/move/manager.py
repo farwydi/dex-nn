@@ -60,6 +60,10 @@ class Manager:
     def reInitWorld(self):
         for x in self.objects:
             x.reInit()
+            if type(x) is box.Food:
+                if x.type == 0:
+                    self.objects.remove(x)
+                    self.createPoison(config.BOX_SIZE)
 
     def _inVision(self, position1, position2):
         f = pow(position1[0] - position2[0], 2) + \
@@ -96,6 +100,7 @@ class Manager:
         position = poison.position
         self.objects.remove(poison)
         food = self.createFood(config.BOX_SIZE)
+        food.type = 0
         food.position = position
 
     def lifeCycle(self):
