@@ -46,7 +46,9 @@ class Object:
             None, self.position, self.rotation, config.PLAYER_STEP)
         self.life()
 
-    def rotate(self):
-        self.rotation += 90
-        if self.rotation > 360:
-            self.rotation -= round(self.rotation / 360) * 360
+    def rotate(self, angle):
+        self.rotation += angle * 360
+        self.rotation -= round(self.rotation / 360) * 360
+        # self.rotation += 90
+        # if self.rotation > 360:
+        #     self.rotation -= round(self.rotation / 360) * 360

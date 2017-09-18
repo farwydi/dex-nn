@@ -65,17 +65,19 @@ class Player(controller.Object):
         self.model = Sequential()
         self.model.add(Dense(18, input_shape=(3,), activation="relu"))
         self.model.add(Dense(4, activation="linear"))
+        self.model.load_weights("moveGame.h5")
 
     def reInit(self):
         self.setRandomPosition()
-        self.health = 250
+        self.health = 500
         self.death = False
         self.rotation = 0
         self.score = 0
 
     def draw(self):
-        text = self.name + '        ' + \
-            str(self.health) + '   ' + str(self.score)
+        text = self.name + '    ' + \
+            str(self.health) + '   ' + \
+            str(self.score) + '  ' + str(self.action)
         self.gm.drawText(text, self.offset, self.color)
 
         if not self.death:
@@ -100,7 +102,7 @@ class Player(controller.Object):
             return True
 
         if not food == None:
-            self.health += 100
+            self.health += 250
             food.reInit()
             self.score += config.SCORE * 10
             print(self.name, 'eat food! +100 HP')
@@ -137,13 +139,13 @@ class Player(controller.Object):
         self.score += config.SCORE
         super().move()
 
-    def rotate(self):
+    def rotate(self, angle):
         self.health -= config.PLAYER_COST_STEP
         self.life()
         if self.death:
             return False
 
-        super().rotate()
+        super().rotate(angle)
 
     def think(self):
         (wall, posion, food) = self.manager.getVision(self)
@@ -158,15 +160,17 @@ class Player(controller.Object):
                ('eat', out[2]),
                ('fix', out[3])]
         out.sort(key=lambda x: x[1], reverse=True)
-        out = out[0][0]
+        out = out[0]
 
-        if out == 'move':
+        self.action = out[0]
+
+        if self.action == 'move':
             self.move()
-        elif out == 'rotate':
-            self.rotate()
-        elif out == 'eat':
+        elif self.action == 'rotate':
+            self.rotate(out[1])
+        elif self.action == 'eat':
             self.eat()
-        elif out == 'fix':
+        elif self.action == 'fix':
             self.fix()
 
     def setWeights(self, w1, w2):
