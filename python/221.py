@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import numpy as np
 import random
 
@@ -52,3 +53,8 @@ for i in range(len(w1)):
         result[i][g] = random.uniform(-1, 1)
 
 print(result)
+=======
+import pydot_ng as pydot
+
+pydot.Dot.create(pydot.Dot())
+>>>>>>> c69d73584897a6cb513654abcb3a500b51bae82b
