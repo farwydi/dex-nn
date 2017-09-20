@@ -16,17 +16,14 @@ class Manager:
         self.iterator = 0
         self.gmu = gm
         self.objects = []
-        self.text_offset = 25
 
     def create_player(self, size, name='Player'):
         """
         Create new Player
         """
-        obj = player.Player(self.gmu, self, name + str(self.iterator),
-                            size, self.text_offset)
+        obj = player.Player(self.gmu, self, name + str(self.iterator), size)
         self.objects.append(obj)
         self.iterator += 1
-        self.text_offset += 30
         return obj
 
     def create_food(self, size, name='Food'):
@@ -158,16 +155,19 @@ class Manager:
             if isinstance(plr, player.Player):
                 if not plr.death:
                     plr.think()
-                    
+
     def score_all(self):
         for plr in self.objects:
             if isinstance(plr, player.Player):
                 if not plr.death:
                     plr.score += 1
 
-    def all_payer_damage(self):
-        for plr in self.objects:
-            if isinstance(plr, player.Player):
-                if not plr.death:
-                    plr.health -= 25
-                    plr.life()
+    def all_payer_damage(self, damage):
+        if damage > 0:
+            print('all player give', damage, 'damage')
+
+            for plr in self.objects:
+                if isinstance(plr, player.Player):
+                    if not plr.death:
+                        plr.health -= damage
+                        plr.life()

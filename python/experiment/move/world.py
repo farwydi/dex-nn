@@ -19,6 +19,7 @@ PLAYERS = [PLAYER]
 SCORES = []
 SCORES.append({'name': PLAYER.name, 'data': []})
 
+
 def init():
     """
     First initialization world
@@ -46,12 +47,11 @@ def cycle(iteration):
         GM.zero()
         MSG.score_all()
 
-        if random.random() < 0.1:
-            MSG.all_payer_damage()
-            print('all player give 25 damage')
+        if random.random() < 0.01:
+            MSG.all_payer_damage(15)
 
         if config.REAL_MODE:
-            key = cv2.waitkey()
+            key = cv2.waitKey()
 
             if key & 0xFF == ord('1'):
                 PLAYER.move()
@@ -76,17 +76,30 @@ def cycle(iteration):
             MSG.draw_all()
 
             if cv2.waitKey(config.DELAY) & 0xFF == ord('q'):
+                for plr in PLAYERS:
+                    plr.save_weights_and_model()
+                    
                 t = np.arange(iteration)
                 for score in SCORES:
                     plt.plot(t, score['data'])
                 plt.show()
+
                 return True
 
+        offset = 25
+        PLAYERS.sort(key=lambda x: x.score, reverse=True)
+        for plr in PLAYERS:
+            plr.get_info(offset)
+            offset += 25
         GM.print()
 
     if not config.REAL_MODE:
-        PLAYERS.sort(key=lambda x: x.score, reverse=True)
-        PLAYERS[0].sex(PLAYERS[1], PLAYERS[3])
+        PLAYERS[0].crossover(PLAYERS[1], PLAYERS[5])
+        PLAYERS[0].crossover(PLAYERS[2], PLAYERS[6])
+        PLAYERS[0].crossover(PLAYERS[3], PLAYERS[7])
+        PLAYERS[1].crossover(PLAYERS[2], PLAYERS[8])
+        PLAYERS[1].crossover(PLAYERS[3], PLAYERS[9])
+        PLAYERS[2].crossover(PLAYERS[3], PLAYERS[10])
 
     for plr in PLAYERS:
         print(plr.name, ':', plr.score)
@@ -105,12 +118,12 @@ def cycle(iteration):
 init()
 
 if config.ROUND_COUNT == -1:
-    IT = 0
+    tick = 0
     while True:
-        if cycle(IT):
+        if cycle(tick):
             break
 
-        IT += 1
+        tick += 1
 
 else:
     for tick in range(config.ROUND_COUNT):

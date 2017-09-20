@@ -74,25 +74,30 @@ def merge(weights_1, weights_2, mutation=True):
 
 
 class Player(controller.Object):
-    def __init__(self, gm, manager, name, size, offset):
+    def __init__(self, gm, manager, name, size):
         super().__init__(gm, manager, name)
         self.size = size
-        self.offset = offset
         self.re_init()
 
-        self.model = Sequential()
+        if not config.REAL_MODE:
+            self.model = Sequential()
+            self.input = Dense(18, input_shape=(6,), activation="relu")
+            self.model.add(self.input)
+            self.hidden_1 = Dense(32, activation="tanh")
+            self.model.add(self.hidden_1)
+            self.model.add(Dropout(0.35))
+            self.hidden_2 = Dense(32, activation="tanh")
+            self.model.add(self.hidden_2)
+            self.model.add(Dropout(0.35))
+            self.output = Dense(4, activation="sigmoid")
+            self.model.add(self.output)
 
-        self.input = Dense(18, input_shape=(6,), activation="relu")
-        self.hidden_1 = Dense(32, activation="tanh")
-        self.hidden_2 = Dense(32, activation="tanh")
-        self.output = Dense(4, activation="sigmoid")
+            # json_model = open("mnist_model.json", "r")
+            # json_model_data = json_model.read()
+            # json_model.close()
+            # model = model_from_json(json_model_data)
 
-        self.model.add(self.input)
-        self.model.add(self.hidden_1)
-        self.model.add(Dropout(0.35))
-        self.model.add(self.hidden_2)
-        self.model.add(Dropout(0.35))
-        self.model.add(self.output)
+            self.model.load_weights("move/" + str(self.name) + "_weights.h5")
 
     def re_init(self):
         self.set_random_position()
@@ -102,19 +107,21 @@ class Player(controller.Object):
         self.score = 0
         self.__score_buffer = 0
         self.rotate_mem = False
-
-    def draw(self):
+        self.action = ''
+        
+    def get_info(self, offset):
         text = self.name + '    ' + \
             str(self.health) + '   ' + \
             str(self.score) + '  ' + str(self.action)
-        self.gmt.drawText(text, self.offset, self.color)
+        self.gmt.drawText(text, offset, self.color)
 
+    def draw(self):
         if not self.death:
             self.gmt.drawLine(tuple(self.position), tuple(
                 self.get_move(self.position, self.rotation, 15)), self.color)
             self.gmt.drawCircle(tuple(self.position), self.size, self.color)
-            self.gmt.drawCircle(tuple(self.position), self.size +
-                                config.PLAYER_VISION, self.color, 1)
+            self.gmt.drawCircle(tuple(self.position),
+                                self.size + config.PLAYER_VISION, self.color, 1)
 
     def life(self):
         self.rotate_mem = False
@@ -149,7 +156,7 @@ class Player(controller.Object):
             print(self.name, 'fix poison! +5x SCORE')
             self.score += config.SCORE * 5
             return True
-        
+
         self.health -= config.PLAYER_COST_STEP * 10
         self.life()
         return False
@@ -177,6 +184,9 @@ class Player(controller.Object):
         """
         think
         """
+        if config.REAL_MODE:
+            return False
+
         (wall, posion, food) = self.manager.get_vision(self)
         data = [wall, 0, 0, 0, 0, 0]
         if not posion == None:
@@ -216,6 +226,9 @@ class Player(controller.Object):
         """
         set_weights
         """
+        if config.REAL_MODE:
+            return False
+
         if len(weights) != 4:
             raise Exception()
 
@@ -224,10 +237,22 @@ class Player(controller.Object):
         self.hidden_2.set_weights(weights[2])
         self.output.set_weights(weights[3])
 
-    def sex(self, partner, progeny):
+    def save_weights_and_model(self):
+        if config.REAL_MODE:
+            return False
+
+        self.model.save_weights("move/" + str(self.name) + "_weights.h5")
+        json_file = open("move/" + str(self.name) + "_model.json", "w")
+        json_file.write(self.model.to_json())
+        json_file.close()
+
+    def crossover(self, partner, progeny):
         """
-        sex marge self with partner
+        crossover self with partner
         """
+        if config.REAL_MODE:
+            return False
+
         input_w = merge(self.input.get_weights(), partner.input.get_weights())
         hidden_1_w = merge(self.hidden_1.get_weights(),
                            partner.hidden_1.get_weights())
