@@ -1,10 +1,16 @@
+"""
+Geometric utils
+"""
 import cv2
-import config
-import controller
 import numpy as np
+
+import config
 
 
 class Geometric:
+    """
+    G Utils
+    """
     def __init__(self):
         self.zero()
 

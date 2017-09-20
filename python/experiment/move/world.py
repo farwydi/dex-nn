@@ -1,78 +1,103 @@
+"""
+Model of world
+"""
+import random
+
 import cv2
-import config
+import matplotlib.pyplot as plt
 import numpy as np
+
+import config
 import geometric
 import manager
-import player
-import time
 
+GM = geometric.Geometric()
+MSG = manager.Manager(GM)
 
-gm = geometric.Geometric()
-manager = manager.Manager(gm)
-
-p1 = manager.createPlayer(config.PLAYER_SIZE)
-players = [p1]
+PLAYER = MSG.create_player(config.PLAYER_SIZE)
+PLAYERS = [PLAYER]
+SCORES = []
+SCORES.append({'name': PLAYER.name, 'data': []})
 
 def init():
-    for x in range(config.WORLD_START_FOOD_COUNT):
-        manager.createFood(config.BOX_SIZE)
-
-    for x in range(config.WORLD_START_POISON_COUNT):
-        manager.createPoison(config.BOX_SIZE)
-
+    """
+    First initialization world
+    """
     if not config.REAL_MODE:
-        for x in range(config.PLAYER_COUNT - 1):
-            players.append(manager.createPlayer(config.PLAYER_SIZE))
+        for _ in range(config.PLAYER_COUNT - 1):
+            plr = MSG.create_player(config.PLAYER_SIZE)
+            PLAYERS.append(plr)
+            SCORES.append({'name': plr.name, 'data': []})
+
+    for _ in range(config.WORLD_START_FOOD_COUNT):
+        MSG.create_food(config.BOX_SIZE)
+
+    for _ in range(config.WORLD_START_POISON_COUNT):
+        MSG.create_poison(config.BOX_SIZE)
 
 
+def cycle(iteration):
+    """
+    Life cycle
+    """
+    print('new cycle: ', iteration)
 
-def cycle(n):
-    print('new cycle: ', n)
+    while not MSG.if_all_player_death():
+        GM.zero()
+        MSG.score_all()
 
-    while not manager.ifAllPlayerDeath():
-        gm.zero()
+        if random.random() < 0.1:
+            MSG.all_payer_damage()
+            print('all player give 25 damage')
 
         if config.REAL_MODE:
-            key = cv2.waitKey()
+            key = cv2.waitkey()
 
             if key & 0xFF == ord('1'):
-                p1.move()
+                PLAYER.move()
 
             if key & 0xFF == ord('2'):
-                p1.rotate()
+                PLAYER.rotate(90)
 
             if key & 0xFF == ord('3'):
-                p1.eat()
+                PLAYER.eat()
 
             if key & 0xFF == ord('4'):
-                p1.fix()
+                PLAYER.fix()
 
             if key & 0xFF == ord('q'):
                 return True
 
-            print(manager.getVision(p1))
+            print(MSG.get_vision(PLAYER))
 
-            manager.drawAll()
+            MSG.draw_all()
         else:
-            manager.action()
-            manager.drawAll()
+            MSG.action()
+            MSG.draw_all()
 
             if cv2.waitKey(config.DELAY) & 0xFF == ord('q'):
+                t = np.arange(iteration)
+                for score in SCORES:
+                    plt.plot(t, score['data'])
+                plt.show()
                 return True
 
-        gm.print()
+        GM.print()
 
     if not config.REAL_MODE:
-        players.sort(key=lambda x: x.score, reverse=True)
-        players[0].sex(players[1], players[3])
+        PLAYERS.sort(key=lambda x: x.score, reverse=True)
+        PLAYERS[0].sex(PLAYERS[1], PLAYERS[3])
 
-    for p in players:
-        print(p.name, ':', p.score)
+    for plr in PLAYERS:
+        print(plr.name, ':', plr.score)
+        for score in SCORES:
+            if score['name'] == plr.name:
+                score['data'].append(plr.score)
 
-    manager.reInitWorld()
-    gm.zero()
-    manager.drawAll()
-    gm.print()
+    MSG.re_init_world()
+    GM.zero()
+    MSG.draw_all()
+    GM.print()
 
     return False
 
@@ -80,16 +105,16 @@ def cycle(n):
 init()
 
 if config.ROUND_COUNT == -1:
-    n = 0
+    IT = 0
     while True:
-        if cycle(n):
+        if cycle(IT):
             break
 
-        n += 1
+        IT += 1
 
 else:
     for tick in range(config.ROUND_COUNT):
         if cycle(tick):
             break
 
-    cv2.waitKey()
+    cv2.waitkey()

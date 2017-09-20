@@ -1,114 +1,173 @@
-import geometric
+"""
+Manager utils
+"""
+import box
 import config
 import controller
 import player
-import box
 
 
 class Manager:
+    """
+    Manager utils
+    """
+
     def __init__(self, gm):
         self.iterator = 0
-        self.gm = gm
+        self.gmu = gm
         self.objects = []
-        self.playerOffset = 25
+        self.text_offset = 25
 
-    def createPlayer(self, size, name='Player', random=True):
-        obj = player.Player(self.gm, self, name + str(self.iterator),
-                            size, self.playerOffset)
+    def create_player(self, size, name='Player'):
+        """
+        Create new Player
+        """
+        obj = player.Player(self.gmu, self, name + str(self.iterator),
+                            size, self.text_offset)
         self.objects.append(obj)
         self.iterator += 1
-        self.playerOffset += 30
+        self.text_offset += 30
         return obj
 
-    def createFood(self, size, name='Food', random=True):
-        obj = box.Food(self.gm, self, name + str(self.iterator), size)
+    def create_food(self, size, name='Food'):
+        """
+        Create new Food
+        """
+        obj = box.Food(self.gmu, self, name + str(self.iterator), size)
         self.objects.append(obj)
         self.iterator += 1
         return obj
 
-    def createPoison(self, size, name='Poison', random=True):
-        obj = box.Poison(self.gm, self, name + str(self.iterator), size)
+    def create_poison(self, size, name='Poison'):
+        """
+        Create new Poison
+        """
+        obj = box.Poison(self.gmu, self, name + str(self.iterator), size)
         self.objects.append(obj)
         self.iterator += 1
         return obj
 
-    def drawAll(self):
-        for x in self.objects:
-            x.draw()
+    def draw_all(self):
+        """
+        Draw All Object
+        """
+        for obj in self.objects:
+            obj.draw()
 
-    def areLive(self):
-        for x in self.objects:
-            if type(x) is player.Player:
-                if x.death:
+    def are_live(self):
+        """
+        return True if all players is not death
+        """
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if plr.death:
                     return False
         return True
 
-    def reInitDeathPlayer(self):
-        for x in self.objects:
-            if type(x) is player.Player:
-                if x.death:
-                    x.reInit()
+    def re_init_death_player(self):
+        """
+        Create new Player
+        """
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if plr.death:
+                    plr.re_init()
 
-    def ifAllPlayerDeath(self):
-        for x in self.objects:
-            if type(x) is player.Player:
-                if not x.death:
+    def if_all_player_death(self):
+        """
+        if_all_player_death
+        """
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if not plr.death:
                     return False
 
         return True
 
-    def reInitWorld(self):
-        for x in self.objects:
-            x.reInit()
-            if type(x) is box.Food:
-                if x.type == 0:
-                    self.objects.remove(x)
-                    self.createPoison(config.BOX_SIZE)
+    def re_init_world(self):
+        """
+        re_init_world
+        """
+        for obj in self.objects:
+            obj.re_init()
+            if isinstance(obj, box.Food):
+                if obj.type == 0:
+                    self.objects.remove(obj)
+                    self.create_poison(config.BOX_SIZE)
 
-    def _inVision(self, position1, position2):
-        f = pow(position1[0] - position2[0], 2) + \
+    @classmethod
+    def __in_vision(cls, position1, position2):
+        """
+        __in_vision
+        """
+        dis = pow(position1[0] - position2[0], 2) + \
             pow(position1[1] - position2[1], 2)
-        if f <= pow(config.PLAYER_VISION * 1.3, 2):
-            return True
-        else:
-            return False
+        return dis <= pow(config.PLAYER_VISION * 1.3, 2)
 
-    def getVision(self, obj):
+    def get_vision(self, obj):
+        """
+        get_vision
+        """
         wall = 0
         posion = None
         food = None
-        for b in self.objects:
-            bPosition = list(b.position)
-            bPosition[0] += int(b.size / 2)
-            bPosition[1] += int(b.size / 2)
-            if type(b) is box.Poison:
-                if self._inVision(bPosition, obj.position):
-                    posion = b
-            if type(b) is box.Food:
-                if self._inVision(bPosition, obj.position):
-                    food = b
+        for v_box in self.objects:
+            b_position = list(v_box.position)
+            b_position[0] += int(v_box.size / 2)
+            b_position[1] += int(v_box.size / 2)
+            if isinstance(v_box, box.Poison):
+                if self.__in_vision(b_position, obj.position):
+                    posion = v_box
+            if isinstance(v_box, box.Food):
+                if self.__in_vision(b_position, obj.position):
+                    food = v_box
 
-        toMove = controller.Object._move(
-            None, obj.position, obj.rotation, config.PLAYER_VISION)
+        to_move = controller.Object.get_move(
+            obj.position, obj.rotation, config.PLAYER_VISION)
 
-        if toMove[0] > config.WORLD_SIZE[0] or toMove[1] > config.WORLD_SIZE[1] or toMove[0] < 0 or toMove[1] < 0:
+        if to_move[0] > config.WORLD_SIZE[0] or to_move[1] > config.WORLD_SIZE[1]:
+            wall = 1
+
+        if to_move[0] < 0 or to_move[1] < 0:
             wall = 1
 
         return (wall, posion, food)
 
-    def poison2Food(self, poison):
+    def poison_2_food(self, poison):
+        """
+        poison_2_food
+        """
         position = poison.position
         self.objects.remove(poison)
-        food = self.createFood(config.BOX_SIZE)
+        food = self.create_food(config.BOX_SIZE)
         food.type = 0
         food.position = position
 
-    def lifeCycle(self):
-        for x in self.objects:
-            x.life()
+    def life_cycle(self):
+        """
+        life_cycle
+        """
+        for plr in self.objects:
+            plr.life()
 
     def action(self):
-        for x in self.objects:
-            if type(x) is player.Player:
-                if not x.death:
-                    x.think()
+        """
+        action
+        """
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if not plr.death:
+                    plr.think()
+                    
+    def score_all(self):
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if not plr.death:
+                    plr.score += 1
+
+    def all_payer_damage(self):
+        for plr in self.objects:
+            if isinstance(plr, player.Player):
+                if not plr.death:
+                    plr.health -= 25
+                    plr.life()

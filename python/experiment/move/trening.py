@@ -1,7 +1,6 @@
-from keras.models import Sequential
-from keras.layers import Dense, Dropout, Activation
-
 import numpy as np
+from keras.layers import Dense, Dropout
+from keras.models import Sequential
 
 model = Sequential()
 model.add(Dense(18, input_shape=(3,), activation='relu'))
