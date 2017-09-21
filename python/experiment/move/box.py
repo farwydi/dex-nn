@@ -43,3 +43,17 @@ class Food(Box):
         super().__init__(gm, manager, name, size)
         self.color = (0, 0, 255)
         self.type = 1
+
+class Well(controller.Object):
+    """
+    Well Object
+    """
+
+    def __init__(self, gm, manager, name, start, end):
+        super().__init__(gm, manager, name)
+        self.color = (255, 255, 0)
+        self.position = start
+        self.end = end
+    
+    def draw(self):
+        self.gmt.drawLine(tuple(self.position), tuple(self.end), self.color)

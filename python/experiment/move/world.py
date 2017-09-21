@@ -36,6 +36,14 @@ def init():
     for _ in range(config.WORLD_START_POISON_COUNT):
         MSG.create_poison(config.BOX_SIZE)
 
+    MSG.create_well([800, 50], [800, 800])
+    MSG.create_well([100, 200], [200, 200])
+    MSG.create_well([500, 500], [200, 200])
+    # MSG.create_well([100, 50], [100, 100])
+    MSG.create_well([1000, 1000], [0, 1200])
+    # MSG.create_well([100, 700], [100, 1000])
+    # MSG.create_well([0, 0], [0, 500])
+
 
 def cycle(iteration):
     """
@@ -57,7 +65,7 @@ def cycle(iteration):
                 PLAYER.move()
 
             if key & 0xFF == ord('2'):
-                PLAYER.rotate(90)
+                PLAYER.rotate(0.2)
 
             if key & 0xFF == ord('3'):
                 PLAYER.eat()
@@ -78,7 +86,7 @@ def cycle(iteration):
             if cv2.waitKey(config.DELAY) & 0xFF == ord('q'):
                 for plr in PLAYERS:
                     plr.save_weights_and_model()
-                    
+
                 t = np.arange(iteration)
                 for score in SCORES:
                     plt.plot(t, score['data'])
@@ -91,6 +99,10 @@ def cycle(iteration):
         for plr in PLAYERS:
             plr.get_info(offset)
             offset += 25
+
+        if config.PLAYER_COUNT - MSG.get_count_death_player() < 2 and PLAYERS[0].score > PLAYERS[1].score:
+            break
+
         GM.print()
 
     if not config.REAL_MODE:
@@ -118,7 +130,7 @@ def cycle(iteration):
 init()
 
 if config.ROUND_COUNT == -1:
-    tick = 0
+    tick=0
     while True:
         if cycle(tick):
             break

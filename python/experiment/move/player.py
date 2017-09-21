@@ -1,3 +1,4 @@
+import os
 import random
 
 import numpy as np
@@ -6,6 +7,8 @@ from keras.models import Sequential
 
 import config
 import controller
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 
 def random_gen(size, max_value):
@@ -81,7 +84,7 @@ class Player(controller.Object):
 
         if not config.REAL_MODE:
             self.model = Sequential()
-            self.input = Dense(18, input_shape=(6,), activation="relu")
+            self.input = Dense(18, input_shape=(5,), activation="relu")
             self.model.add(self.input)
             self.hidden_1 = Dense(32, activation="tanh")
             self.model.add(self.hidden_1)
@@ -97,7 +100,8 @@ class Player(controller.Object):
             # json_model.close()
             # model = model_from_json(json_model_data)
 
-            self.model.load_weights("move/" + str(self.name) + "_weights.h5")
+            # self.model.load_weights("move/" + str(self.name) + "_weights.h5")
+            self.model.load_weights("move/moveGame.h5")
 
     def re_init(self):
         self.set_random_position()
@@ -108,7 +112,7 @@ class Player(controller.Object):
         self.__score_buffer = 0
         self.rotate_mem = False
         self.action = ''
-        
+
     def get_info(self, offset):
         text = self.name + '    ' + \
             str(self.health) + '   ' + \
@@ -188,7 +192,7 @@ class Player(controller.Object):
             return False
 
         (wall, posion, food) = self.manager.get_vision(self)
-        data = [wall, 0, 0, 0, 0, 0]
+        data = [wall, 0, 0, 0, 0]
         if not posion == None:
             data[1] = 1
         if not food == None:
@@ -197,9 +201,9 @@ class Player(controller.Object):
         # thought
         data[3] = random.random()
 
-        data[4] = (self.score - self.__score_buffer) / \
-            config.PLAYER_COST_STEP * 5
-        data[5] = self.health / config.PLAYER_MAX_HEALTH
+        # data[4] = (self.score - self.__score_buffer) / \
+        #     config.PLAYER_COST_STEP * 5
+        data[4] = self.health / config.PLAYER_MAX_HEALTH
 
         out = list(self.model.predict(np.array([tuple(data)]))[0])
         out = [('move', out[0]),
