@@ -95,13 +95,8 @@ class Player(controller.Object):
             self.output = Dense(4, activation="sigmoid")
             self.model.add(self.output)
 
-            # json_model = open("mnist_model.json", "r")
-            # json_model_data = json_model.read()
-            # json_model.close()
-            # model = model_from_json(json_model_data)
-
-            # self.model.load_weights("move/" + str(self.name) + "_weights.h5")
-            self.model.load_weights("move/moveGame.h5")
+            if config.AUTO_LOAD_WEIGHT:
+                self.model.load_weights("move/" + str(self.name) + "_weights.h5")
 
     def re_init(self):
         self.set_random_position()
@@ -246,9 +241,6 @@ class Player(controller.Object):
             return False
 
         self.model.save_weights("move/" + str(self.name) + "_weights.h5")
-        json_file = open("move/" + str(self.name) + "_model.json", "w")
-        json_file.write(self.model.to_json())
-        json_file.close()
 
     def crossover(self, partner, progeny):
         """

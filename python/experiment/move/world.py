@@ -39,10 +39,7 @@ def init():
     MSG.create_well([800, 50], [800, 800])
     MSG.create_well([100, 200], [200, 200])
     MSG.create_well([500, 500], [200, 200])
-    # MSG.create_well([100, 50], [100, 100])
     MSG.create_well([1000, 1000], [0, 1200])
-    # MSG.create_well([100, 700], [100, 1000])
-    # MSG.create_well([0, 0], [0, 500])
 
 
 def cycle(iteration):

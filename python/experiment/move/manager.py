@@ -173,10 +173,6 @@ class Manager:
                 if self.__in_vision(b_position, obj.position):
                     food = v_box
             if isinstance(v_box, box.Well):
-                self.gmu.drawLine(tuple(obj.position),
-                                  tuple(to_move), (0, 255, 0))
-                self.gmu.drawLine(tuple(v_box.position),
-                                  tuple(v_box.end), (0, 255, 0))
                 if self.__point_calc(obj.position, list(to_move), v_box.position, v_box.end):
                     wall = 1
 
