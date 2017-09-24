@@ -84,6 +84,8 @@ def cycle(iteration):
             MSG.draw_all()
 
             if cv2.waitKey(config.DELAY) & 0xFF == ord('q'):
+                cv2.destroyAllWindows()
+                
                 for plr in PLAYERS:
                     plr.save_weights_and_model()
 

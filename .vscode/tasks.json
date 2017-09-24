@@ -6,7 +6,7 @@
         {
             "taskName": "run",
             "type": "shell",
-            "command": "python ${file}",
+            "command": "python3 ${workspaceRoot}/python/experiment/move/world.py",
             "group": {
                 "kind": "build",
                 "isDefault": true
